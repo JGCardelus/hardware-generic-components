@@ -1,0 +1,8 @@
+{
+    "project-folders": ["C:\\Users\\jgcar\\Desktop\\Coding\\LowLevel\\projects"],
+    "components-folders": ["."],
+    "exclude-components": [],
+    "exclude-projects": [],
+    "allowed-extensions": ["vhd"],
+    "verbose": true
+}
