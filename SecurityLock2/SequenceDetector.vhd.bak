@@ -1,0 +1,80 @@
+library IEEE;
+use IEEE.std_logic_1164.all;
+
+-- Activate valid if a sequence is correct
+
+entity SequenceDetector is
+	port (
+		clk, reset, in0, in1 : in std_logic;
+		waiting, valid : out std_logic
+	);
+end SequenceDetector;
+
+architecture behavioural of SequenceDetector is
+	type states is (Closed, In0, In0In1, In0In1In1, Valid);
+	signal state_current, state_next : states;
+
+	signal in_vector : std_logic_vector(1 downto 0);
+begin
+
+	EventHandler : process(clk, reset)
+	begin
+		if not(reset) = '1' then
+			state_current <= Closed;
+		elsif clk'event and clk = '1' then
+			state_current <= state_next;
+		end if;
+	end process EventHandler;
+
+	StateManager : process(state_next, in0, in1)
+	begin
+		-- For easier if statements
+		in_vector <= in0 & in1;
+		-- By default leave state as is
+		state_next <= state_current;
+		case state_current is
+			when Closed =>
+				if in_vector = "10" then
+					state_next <= In0;
+				end if;
+			when In0 =>
+				if in_vector = "01" then
+					state_next <= In0In1;
+				elsif in_vector = "11" or in_vector = "10" then
+					state_next <= Closed;
+				end if;
+			when In0In1 =>
+				if in_vector = "01" then
+					state_next <= In0In1In1;
+				elsif in_vector = "11" or in_vector = "10" then
+					state_next <= Closed;
+				end if;
+			when In0In1In1 =>
+				if in_vector = "10" then
+					state_next <= Valid;
+				elsif in_vector = "11" or in_vector = "01" then
+					state_next <= Closed;
+				end if;
+			when Valid =>
+				if in_vector = "10" then
+					state_next <= In0;
+				elsif in_vector = "11" or in_vector = "01" then
+					state_next <= Closed;
+				end if;
+		end case;
+	end process StateManager;
+
+	OutputManager : process(state_current)
+	begin
+		-- By default the answer will not be valid
+		waiting <= '1';
+		valid <= '0';
+
+		case state_current is
+			when Valid =>
+				waiting <= '0';
+				valid <= '1';
+		end case;
+	end process OutputManager;
+
+end behavioural;

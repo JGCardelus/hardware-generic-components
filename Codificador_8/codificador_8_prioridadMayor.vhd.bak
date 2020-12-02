@@ -1,0 +1,26 @@
+library IEEE;
+use IEEE.std_logic_1164.all;
+
+entity Codificador_8_prioridadNo is
+	port (
+		e : in std_logic_vector(7 downto 0);
+		i : out std_logic;
+		s : out std_logic_vector(2 downto 0)
+	);
+end Codificador_8_prioridadNo;
+
+architecture behavioural of Codificador_8_prioridadNo is
+begin
+
+	with e select
+		s <= 	"001" when "0000000",
+				"010" when "000001-",
+				"011" when "00001--",
+				"100" when "0001---",
+				"101" when "001----",
+				"110" when "01-----",
+				"111" when "1------",
+				"XXX" when others;
+
+	i <= '1' when e = "0000000" else '0';
+end behavioural;

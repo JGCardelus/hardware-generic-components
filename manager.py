@@ -207,6 +207,8 @@ def export_components_to_project(project_idx, components_idx):
     project = manager.projects[project_idx]
     if verbose:
         print(f"Exporting to project: {project.name}")
+    
+    initialized_components = project.get_initialized_components()
     for i in components_idx:
         component = manager.components[i]
         if verbose:
@@ -218,8 +220,10 @@ def export_components_to_project(project_idx, components_idx):
         if verbose:
             print(f"    Updating project's settings file")
 
+        
         for filename in component.filenames:
-            project.add_file(filename)
+            if filename not in initialized_components:
+                project.add_file(filename)
 
     if verbose:
         print(f"Components have been exported succesfully")
